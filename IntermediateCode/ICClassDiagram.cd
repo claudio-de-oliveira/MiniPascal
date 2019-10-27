@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="IntermediateCode.IntermediateInstruction">
+    <Position X="9.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAgAAAAAAAAAKAAAAKAAAAAAAAAAAAAAAAAAAAQ=</HashCode>
+      <FileName>IntermediateInstruction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IntermediateCode.Nop">
+    <Position X="16.5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IntermediateInstruction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IntermediateCode.Binary">
+    <Position X="1.5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IntermediateInstruction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IntermediateCode.Unary">
+    <Position X="2.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IntermediateInstruction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IntermediateCode.Copy">
+    <Position X="3.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IntermediateInstruction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IntermediateCode.Goto">
+    <Position X="4.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IntermediateInstruction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IntermediateCode.IfTrue">
+    <Position X="6.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IntermediateInstruction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IntermediateCode.IfFalse">
+    <Position X="7.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IntermediateInstruction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IntermediateCode.IfExp">
+    <Position X="5.5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IntermediateInstruction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IntermediateCode.Param">
+    <Position X="8.5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IntermediateInstruction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IntermediateCode.Call">
+    <Position X="9.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IntermediateInstruction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IntermediateCode.Return">
+    <Position X="10.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IntermediateInstruction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IntermediateCode.ToArray">
+    <Position X="15.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IntermediateInstruction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IntermediateCode.FromArray">
+    <Position X="14.5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IntermediateInstruction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IntermediateCode.AddressOf">
+    <Position X="11.5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IntermediateInstruction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IntermediateCode.FromMemory">
+    <Position X="12.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IntermediateInstruction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IntermediateCode.ToMemory">
+    <Position X="13.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IntermediateInstruction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="IntermediateCode.Operator">
+    <Position X="18.5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>TAIQAAQAACAGKoYQAAAIIIAAAAFIgACYAAAAEAAAAIA=</HashCode>
+      <FileName>IntermediateInstruction.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

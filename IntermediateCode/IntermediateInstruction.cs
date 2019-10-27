@@ -100,7 +100,7 @@ namespace IntermediateCode
         {
             id = count;
             count++;
-            this.name = "t_{" + count.ToString() + "}";
+            this.name = "tmp" + count.ToString() + "";
             Symbols.Add(this);
         }
 
@@ -121,34 +121,6 @@ namespace IntermediateCode
 
         public override string ToString()
         { return name; }
-    }
-
-    public class Accumulator : Address
-    {
-        public static Accumulator accumulator = new Accumulator();
-
-        protected Accumulator()
-        {
-            /* Nothing more todo */ 
-        }
-
-        public override bool Equals(object obj)
-        {
-            // If one is null, but not both, return false.
-            if (obj == null)
-                return false;
-
-            if (GetType() != obj.GetType())
-                return false;
-
-            return true;
-        }
-
-        public override int GetHashCode()
-        { return base.GetHashCode(); }
-
-        public override string ToString()
-        { return "Acc"; }
     }
 
     public class Label : Address
@@ -195,7 +167,7 @@ namespace IntermediateCode
         public override string ToString()
         {
             if (Value != -1)
-                return val.ToString(); 
+                return "$" + val.ToString(); 
             else
                 return "@" + blk.Id.ToString(); 
         }
@@ -399,90 +371,97 @@ namespace IntermediateCode
             switch (Op)
             {
                 case Operator.COPY:
-                    str += "(COPY,\\:" + Arg1.ToString() + ",\\:" + Arg2.ToString() + ")";
+                    str += "(COPY, " + Arg1.ToString() + ", " + Arg2.ToString() + ")";
                     break;
                 case Operator.MUL:
-                    str += "(*,\\:" + Arg1.ToString() + ",\\:" + Arg2.ToString() + ")";
+                    str += "(*, " + Arg1.ToString() + ", " + Arg2.ToString() + ")";
                     break;
                 case Operator.DIV:
-                    str += "(/,\\:" + Arg1.ToString() + ",\\:" + Arg2.ToString() + ")";
+                    str += "(/, " + Arg1.ToString() + ", " + Arg2.ToString() + ")";
                     break;
                 case Operator.ADD:
-                    str += "(+,\\:" + Arg1.ToString() + ",\\:" + Arg2.ToString() + ")";
+                    str += "(+, " + Arg1.ToString() + ", " + Arg2.ToString() + ")";
                     break;
                 case Operator.SUB:
-                    str += "(-,\\:" + Arg1.ToString() + ",\\:" + Arg2.ToString() + ")";
-                    break;
-                case Operator.INC:
-                    str += "(++,\\:" + Arg1.ToString() + ")";
-                    break;
-                case Operator.DEC:
-                    str += "(--,\\:" + Arg1.ToString() + ")";
-                    break;
-                case Operator.NEG:
-                    str += "(-,\\:" + Arg1.ToString() + ")";
+                    str += "(-, " + Arg1.ToString() + ", " + Arg2.ToString() + ")";
                     break;
                 case Operator.NOT:
-                    str += "(!,\\:" + Arg1.ToString() + ")";
+                    str += "(not, " + Arg1.ToString() + ", " + "---" + ")";
                     break;
                 case Operator.PARAM:
-                    str += "(Param,\\:" + Arg1.ToString() + ")";
+                    str += "(PARAM, " + Arg1.ToString() + ", " + "---" + ")";
                     break;
                 case Operator.GOTO:
-                    str += "(Goto,\\:" + Arg2.ToString() + ")";
+                    str += "(GOTO, " + "---" + ", " + Arg2.ToString() + ")";
                     break;
                 case Operator.IFTRUE:
-                    str += "(IfTrue,\\:" + Arg1.ToString() + ",\\:" + Arg2.ToString() + ")";
+                    str += "(IFTRUE, " + Arg1.ToString() + ", " + Arg2.ToString() + ")";
                     break;
                 case Operator.IFFALSE:
-                    str += "(IfFalse,\\:" + Arg1.ToString() + ",\\:" + Arg2.ToString() + ")";
+                    str += "(IFFALSE, " + Arg1.ToString() + ", " + Arg2.ToString() + ")";
                     break;
                 case Operator.CALL:
-                    str += "(Call,\\:" + Arg1.ToString() + ",\\:" + Arg2.ToString() + ")";
-                    break;
-                case Operator.ADDRESS:
-                    str += "(&,\\:" + Arg1.ToString() + ",\\:" + Arg2.ToString() + ")";
+                    str += "(CALL, " + Arg1.ToString() + ", " + Arg2.ToString() + ")";
                     break;
                 case Operator.LT:
-                    str += "(<,\\:" + Arg1.ToString() + ",\\:" + Arg2.ToString() + ")";
+                    str += "(<, " + Arg1.ToString() + ", " + Arg2.ToString() + ")";
                     break;
                 case Operator.LE:
-                    str += "(<=,\\:" + Arg1.ToString() + ",\\:" + Arg2.ToString() + ")";
+                    str += "(<=, " + Arg1.ToString() + ", " + Arg2.ToString() + ")";
                     break;
                 case Operator.GT:
-                    str += "(>,\\:" + Arg1.ToString() + ",\\:" + Arg2.ToString() + ")";
+                    str += "(>, " + Arg1.ToString() + ", " + Arg2.ToString() + ")";
                     break;
                 case Operator.GE:
-                    str += "(>=,\\:" + Arg1.ToString() + ",\\:" + Arg2.ToString() + ")";
+                    str += "(>=, " + Arg1.ToString() + ", " + Arg2.ToString() + ")";
                     break;
                 case Operator.EQ:
-                    str += "(==,\\:" + Arg1.ToString() + ",\\:" + Arg2.ToString() + ")";
+                    str += "(=, " + Arg1.ToString() + ", " + Arg2.ToString() + ")";
                     break;
                 case Operator.NEQ:
-                    str += "(!=,\\:" + Arg1.ToString() + ",\\:" + Arg2.ToString() + ")";
-                    break;
-                case Operator.FROMMEMORY:
-                    str += "(FROMMEMORY)";
-                    break;
-                case Operator.TOMEMORY:
-                    str += "(TOMEMORY)";
+                    str += "(<>, " + Arg1.ToString() + ", " + Arg2.ToString() + ")";
                     break;
                 case Operator.FROMARRAY:
-                    str += "(FROMARRAY)";
+                    str += "(FROMARRAY, " + Arg1.ToString() + ", " + Arg2.ToString() + ")";
                     break;
                 case Operator.TOARRAY:
-                    str += "(TOARRAY)";
-                    break;
-                case Operator.IFEXP:
-                    str += "(IFEXP)";
+                    str += "(TOARRAY, " + Arg1.ToString() + ", " + Arg2.ToString() + ")";
                     break;
                 case Operator.RETURN:
-                    str += "(RETURN)";
+                    str += "(RETURN, " + "---" + ", " + "---" + ")";
                     break;
                 case Operator.RETVAL:
+                    str += "(RETURN, " + Arg1.ToString() + ", " + "---" + ")";
                     break;
                 case Operator.CONTINUE:
-                    str += "(continue,\\:" + Arg1.ToString() + ",\\:" + Arg2.ToString() + ")";
+                    if (Arg1 != null && Arg2 != null)
+                        str += "(CONTINUE, " + Arg1.ToString() + ", " + Arg2.ToString() + ")";
+                    else if (Arg1 != null)
+                        str += "(CONTINUE, " + Arg1.ToString() + ", " + "---" + ")";
+                    else // if (Arg2 != null)
+                        str += "(CONTINUE, " + "---" + ", " + Arg2.ToString() + ")";
+                    break;
+
+                case Operator.INC: // Não usado no MiniPascal
+                    str += "(++, " + Arg1.ToString() + ", " + "---" + ")";
+                    break;
+                case Operator.DEC: // Não usado no MiniPascal
+                    str += "(--, " + Arg1.ToString() + ", " + "---" + ")";
+                    break;
+                case Operator.NEG: // Não usado no MiniPascal
+                    str += "(-, " + Arg1.ToString() + ", " + "---" + ")";
+                    break;
+                case Operator.IFEXP: // Não usado no MiniPascal
+                    str += "(IFEXP)";
+                    break;
+                case Operator.ADDRESS: // Não usado no MiniPascal
+                    str += "(&, " + Arg1.ToString() + ", " + Arg2.ToString() + ")";
+                    break;
+                case Operator.FROMMEMORY: // Não usado no MiniPascal
+                    str += "(FROMMEMORY)";
+                    break;
+                case Operator.TOMEMORY: // Não usado no MiniPascal
+                    str += "(TOMEMORY)";
                     break;
             }
 
@@ -515,6 +494,16 @@ namespace IntermediateCode
 
         public TAC this[int i]
         { get { if (pos < 0) return null; else return tuples[pos + i]; } }
+
+        public override string ToString()
+        {
+            string str = "";
+
+            for (int i = 0; i < tuples.Count; i++)
+                str += String.Format("\t{0}", tuples[i].ToString());
+
+            return str;
+        }
     }
 
     public class Nop : IntermediateInstruction
@@ -525,7 +514,9 @@ namespace IntermediateCode
         }
 
         public override string ToString()
-        { return "nop"; }
+        { 
+            return "nop" + base.ToString(); 
+        }
     }
 
     public class Binary : IntermediateInstruction
@@ -548,38 +539,39 @@ namespace IntermediateCode
             switch (tuples[pos].Op)
             {
                 case Operator.MUL:
-                    str += tuples[pos + 1].Arg2.ToString() + ":=" + tuples[pos].Arg1.ToString() + "*" + tuples[pos].Arg2.ToString();
+                    str += tuples[pos + 1].Arg2.ToString() + " := " + tuples[pos].Arg1.ToString() + "*" + tuples[pos].Arg2.ToString();
                     break;
                 case Operator.DIV:
-                    str += tuples[pos + 1].Arg2.ToString() + ":=" + tuples[pos].Arg1.ToString() + "/" + tuples[pos].Arg2.ToString();
+                    str += tuples[pos + 1].Arg2.ToString() + " := " + tuples[pos].Arg1.ToString() + "/" + tuples[pos].Arg2.ToString();
                     break;
                 case Operator.ADD:
-                    str += tuples[pos + 1].Arg2.ToString() + ":=" + tuples[pos].Arg1.ToString() + "+" + tuples[pos].Arg2.ToString();
+                    str += tuples[pos + 1].Arg2.ToString() + " := " + tuples[pos].Arg1.ToString() + "+" + tuples[pos].Arg2.ToString();
                     break;
                 case Operator.SUB:
-                    str += tuples[pos + 1].Arg2.ToString() + ":=" + tuples[pos].Arg1.ToString() + "-" + tuples[pos].Arg2.ToString();
+                    str += tuples[pos + 1].Arg2.ToString() + " := " + tuples[pos].Arg1.ToString() + "-" + tuples[pos].Arg2.ToString();
                     break;
 
                 case Operator.LT:
-                    str += tuples[pos + 1].Arg2.ToString() + ":=" + tuples[pos].Arg1.ToString() + "<" + tuples[pos].Arg2.ToString();
+                    str += tuples[pos + 1].Arg2.ToString() + " := " + tuples[pos].Arg1.ToString() + "<" + tuples[pos].Arg2.ToString();
                     break;
                 case Operator.LE:
-                    str += tuples[pos + 1].Arg2.ToString() + ":=" + tuples[pos].Arg1.ToString() + "<=" + tuples[pos].Arg2.ToString();
+                    str += tuples[pos + 1].Arg2.ToString() + " := " + tuples[pos].Arg1.ToString() + "<=" + tuples[pos].Arg2.ToString();
                     break;
                 case Operator.GT:
-                    str += tuples[pos + 1].Arg2.ToString() + ":=" + tuples[pos].Arg1.ToString() + ">" + tuples[pos].Arg2.ToString();
+                    str += tuples[pos + 1].Arg2.ToString() + " := " + tuples[pos].Arg1.ToString() + ">" + tuples[pos].Arg2.ToString();
                     break;
                 case Operator.GE:
-                    str += tuples[pos + 1].Arg2.ToString() + ":=" + tuples[pos].Arg1.ToString() + ">=" + tuples[pos].Arg2.ToString();
+                    str += tuples[pos + 1].Arg2.ToString() + " := " + tuples[pos].Arg1.ToString() + ">=" + tuples[pos].Arg2.ToString();
                     break;
                 case Operator.EQ:
-                    str += tuples[pos + 1].Arg2.ToString() + ":=" + tuples[pos].Arg1.ToString() + "=" + tuples[pos].Arg2.ToString();
+                    str += tuples[pos + 1].Arg2.ToString() + " := " + tuples[pos].Arg1.ToString() + "=" + tuples[pos].Arg2.ToString();
                     break;
                 case Operator.NEQ:
-                    str += tuples[pos + 1].Arg2.ToString() + ":=" + tuples[pos].Arg1.ToString() + "<>" + tuples[pos].Arg2.ToString();
+                    str += tuples[pos + 1].Arg2.ToString() + " := " + tuples[pos].Arg1.ToString() + "<>" + tuples[pos].Arg2.ToString();
                     break;
             }
-            return str;
+
+            return str + "\t" + base.ToString();
         }
     }
 
@@ -601,10 +593,10 @@ namespace IntermediateCode
             switch (tuples[pos].Op)
             {
                 case Operator.INC:
-                    str += tuples[pos].Arg1.ToString() + ":=" + tuples[pos].Arg2.ToString() + "+1";
+                    str += tuples[pos].Arg1.ToString() + " := " + tuples[pos].Arg2.ToString() + "+1";
                     break;
                 case Operator.DEC:
-                    str += tuples[pos].Arg1.ToString() + ":=" + tuples[pos].Arg2.ToString() + "-1";
+                    str += tuples[pos].Arg1.ToString() + " := " + tuples[pos].Arg2.ToString() + "-1";
                     break;
                 case Operator.NEG:
                     str += tuples[pos].Arg1.ToString() + ":=-" + tuples[pos].Arg2.ToString();
@@ -613,7 +605,7 @@ namespace IntermediateCode
                     str += tuples[pos].Arg1.ToString() + ":=!" + tuples[pos].Arg2.ToString();
                     break;
             }
-            return str;
+            return str + "\t" + base.ToString();
         }
     }
 
@@ -634,8 +626,8 @@ namespace IntermediateCode
         public override string ToString()
         {
             string str = "";
-            str += tuples[pos].Arg1.ToString() + ":=" + tuples[pos].Arg2.ToString();
-            return str;
+            str += tuples[pos].Arg1.ToString() + " := " + tuples[pos].Arg2.ToString();
+            return str + "\t" + base.ToString();
         }
     }
 
@@ -652,8 +644,8 @@ namespace IntermediateCode
         public override string ToString()
         {
             string str = "";
-            str += "goto\\:" + tuples[pos].Arg2.ToString();
-            return str;
+            str += "goto " + tuples[pos].Arg2.ToString();
+            return str + "\t" + base.ToString();
         }
     }
 
@@ -670,8 +662,8 @@ namespace IntermediateCode
         public override string ToString()
         {
             string str = "";
-            str += "if\\:" + tuples[pos].Arg1.ToString() + "\\:goto\\:" + tuples[pos].Arg2.ToString();
-            return str;
+            str += "if " + tuples[pos].Arg1.ToString() + " goto " + tuples[pos].Arg2.ToString();
+            return str + "\t" + base.ToString();
         }
     }
 
@@ -688,8 +680,8 @@ namespace IntermediateCode
         public override string ToString()
         {
             string str = "";
-            str += "ifFalse\\:" + tuples[pos].Arg1.ToString() + "\\:goto\\:" + tuples[pos].Arg2.ToString();
-            return str;
+            str += "ifFalse " + tuples[pos].Arg1.ToString() + " goto " + tuples[pos].Arg2.ToString();
+            return str + "\t" + base.ToString();
         }
     }
 
@@ -710,7 +702,7 @@ namespace IntermediateCode
         {
             string str = "";
 
-            str += "if\\:" + tuples[pos + 1].Arg1.ToString();
+            str += "if " + tuples[pos + 1].Arg1.ToString();
             switch (tuples[pos + 1].Op)
             {
                 case Operator.LT:
@@ -734,8 +726,9 @@ namespace IntermediateCode
                 default:
                     break;
             }
-            str += tuples[pos + 1].Arg2.ToString() + "\\:goto\\:" + tuples[pos].Arg2.ToString();
-            return str;
+            str += tuples[pos + 1].Arg2.ToString() + " goto " + tuples[pos].Arg2.ToString();
+
+            return str + "\t" + base.ToString();
         }
     }
 
@@ -752,8 +745,8 @@ namespace IntermediateCode
         public override string ToString()
         {
             string str = "";
-            str += "param\\:" + tuples[pos].Arg1.ToString();
-            return str;
+            str += "param " + tuples[pos].Arg1.ToString();
+            return str + "\t" + base.ToString();
         }
     }
 
@@ -769,24 +762,32 @@ namespace IntermediateCode
         public override string ToString()
         {
             string str = "";
-            str += "call\\:" + tuples[pos].Arg2.ToString() + ",\\:" + tuples[pos].Arg1.ToString();
-            return str;
+            str += "call " + tuples[pos].Arg2.ToString() + ", " + tuples[pos].Arg1.ToString();
+            return str + "\t" + base.ToString();
         }
     }
 
     public class Return : IntermediateInstruction
     {
         public Return()
-        // return
         {
             TAC ic = new TAC(Operator.RETURN, null, null);
             pos = tuples.Count;
             tuples.Add(ic);
         }
-        public Return(Address x)
+
+        public override string ToString()
+        {
+            return "return\t" + base.ToString();
+        }
+    }
+
+    public class RetVal : IntermediateInstruction
+    {
+        public RetVal(Address x)
         // return x
         {
-            TAC ic = new TAC(Operator.RETURN, x, null);
+            TAC ic = new TAC(Operator.RETVAL, x, null);
             pos = tuples.Count;
             tuples.Add(ic);
         }
@@ -794,11 +795,8 @@ namespace IntermediateCode
         public override string ToString()
         {
             string str = "";
-            if (tuples[pos].Arg1 != null)
-                str += "return\\:" + tuples[pos].Arg1.ToString();
-            else
-                str += "return";
-            return str;
+            str += "return " + tuples[pos].Arg1.ToString();
+            return str + "\t" + base.ToString();
         }
     }
 
@@ -819,8 +817,8 @@ namespace IntermediateCode
         {
             string str = "";
             // str += tuples[pos].Arg1.ToString() + "[" + tuples[pos].Arg2.ToString() + "]:=" + tuples[pos + 1].Arg1.ToString();
-            str += tuples[pos].Arg1.ToString() + ":=" + tuples[pos + 1].Arg1.ToString() + "[" + tuples[pos].Arg2.ToString() + "]";
-            return str;
+            str += tuples[pos].Arg1.ToString() + " := " + tuples[pos + 1].Arg1.ToString() + "[" + tuples[pos].Arg2.ToString() + "]";
+            return str + "\t" + base.ToString();
         }
     }
 
@@ -841,8 +839,8 @@ namespace IntermediateCode
         public override string ToString()
         {
             string str = "";
-            str += tuples[pos + 1].Arg1.ToString() + ":=" + tuples[pos].Arg1.ToString() + "[" + tuples[pos].Arg2.ToString() + "]";
-            return str;
+            str += tuples[pos + 1].Arg1.ToString() + " := " + tuples[pos].Arg1.ToString() + "[" + tuples[pos].Arg2.ToString() + "]";
+            return str + "\t" + base.ToString();
         }
     }
 
@@ -861,7 +859,7 @@ namespace IntermediateCode
         {
             string str = "";
             str += tuples[pos].Arg1.ToString() + ":=\\&" + tuples[pos].Arg2.ToString();
-            return str;
+            return str + "\t" + base.ToString();
         }
     }
 
@@ -880,7 +878,7 @@ namespace IntermediateCode
         {
             string str = "";
             str += tuples[pos].Arg1.ToString() + ":=*" + tuples[pos].Arg2.ToString();
-            return str;
+            return str + "\t" + base.ToString();
         }
     }
 
@@ -897,8 +895,8 @@ namespace IntermediateCode
         public override string ToString()
         {
             string str = "";
-            str += "*" + tuples[pos].Arg1.ToString() + ":=" + tuples[pos].Arg2.ToString();
-            return str;
+            str += "*" + tuples[pos].Arg1.ToString() + " := " + tuples[pos].Arg2.ToString();
+            return str + "\t" + base.ToString();
         }
     }
     #endregion

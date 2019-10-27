@@ -65,7 +65,7 @@ namespace IntermediateCode
         public IntermediateInstruction CreateCopy(Address x, Address y)
         // x = y
         {
-            if (x.GetType() != typeof(Name) && x.GetType() != typeof(Accumulator))
+            if (x.GetType() != typeof(Name))
                 throw new InvalidCastException("Invalid Parameter Type");
             return new Copy(x, y);
         }
@@ -114,7 +114,7 @@ namespace IntermediateCode
         public IntermediateInstruction CreateRetVal(Address x)
         // return x
         {
-            return new Return(x);
+            return new RetVal(x);
         }
 
         public IntermediateInstruction CreateFromArray(Address x, Address i, Address y)

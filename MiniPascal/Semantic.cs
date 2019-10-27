@@ -10,6 +10,7 @@ namespace MiniPascal
     class Semantic
     {
         AbsMachine ic = new AbsMachine();
+        string programName = "";
 
         public void Execute(Tag action, Stack<Tag> stk, Token tk, ref Environment env)
         {
@@ -144,7 +145,7 @@ namespace MiniPascal
             else if (action == Tag._EnvRestore)
             {
                 IntermediateInstruction code = ic.CreateReturn();
-                Console.WriteLine(code.ToString());
+                // Console.WriteLine(code.ToString());
                 env.machine.AddInstruction(code);
 
                 env = env.parent;
@@ -174,7 +175,7 @@ namespace MiniPascal
                 Name tmp = new Name();
 
                 IntermediateInstruction code = ic.CreateUnary(Operator.NOT, (Address)action.Inherited[0], tmp);
-                Console.WriteLine(code.ToString());
+                // Console.WriteLine(code.ToString());
                 env.machine.AddInstruction(code);
 
                 stk.ElementAt<Tag>(0).Inherited[0] = tmp;
@@ -187,7 +188,7 @@ namespace MiniPascal
             {
                 FuncType func = (FuncType)Environment.Search(env, ((IdFunc)tk).Lexema);
 
-                stk.ElementAt<Tag>(1).Inherited[1] = func.Env.CodeAddress;
+                stk.ElementAt<Tag>(1).Inherited[1] = func;
             }
             else if (action == Tag._PAddress) // Endereço do procedimento
             {
@@ -198,15 +199,16 @@ namespace MiniPascal
             else if (action == Tag._FCall) // Chamada de função
             {
                 // Destino
-                Label label = new Label((int)action.Inherited[1]);
+                FuncType func = (FuncType)action.Inherited[1];
+                Label label = new Label(func.Env.CodeAddress);
                 // Número de argumentos
                 int n = (int)action.Inherited[0];
 
                 IntermediateInstruction code = ic.CreateCall(label, n);
-                Console.WriteLine(code.ToString());
+                // Console.WriteLine(code.ToString());
                 env.machine.AddInstruction(code);
 
-                stk.ElementAt<Tag>(0).Inherited[0] = Accumulator.accumulator;
+                stk.ElementAt<Tag>(0).Inherited[0] = func.Env.returnvalue;
             }
             else if (action == Tag._PCall) // Chamada de procedimento
             {
@@ -216,13 +218,13 @@ namespace MiniPascal
                 int n = (int)action.Inherited[0];
 
                 IntermediateInstruction code = ic.CreateCall(label, n);
-                Console.WriteLine(code.ToString());
+                // Console.WriteLine(code.ToString());
                 env.machine.AddInstruction(code);
             }
             else if (action == Tag._FirstActualPar) // Primeiro parâmetro atual
             {
                 IntermediateInstruction code = ic.CreateParam((Address)action.Inherited[0]);
-                Console.WriteLine(code.ToString());
+                // Console.WriteLine(code.ToString());
                 env.machine.AddInstruction(code);
 
                 stk.ElementAt<Tag>(0).Inherited[0] = 1; // Primeiro parametro
@@ -230,7 +232,7 @@ namespace MiniPascal
             else if (action == Tag._NextActualPar) // Próximo parâmetro atual
             {
                 IntermediateInstruction code = ic.CreateParam((Address)action.Inherited[0]);
-                Console.WriteLine(code.ToString());
+                // Console.WriteLine(code.ToString());
                 env.machine.AddInstruction(code);
 
                 stk.ElementAt<Tag>(0).Inherited[0] = (int)action.Inherited[1] + 1;
@@ -259,7 +261,7 @@ namespace MiniPascal
                 Name tmp = new Name();
 
                 IntermediateInstruction code = ic.CreateBinary(op, tmp, x, y);
-                Console.WriteLine(code.ToString());
+                // Console.WriteLine(code.ToString());
                 env.machine.AddInstruction(code);
 
                 stk.ElementAt<Tag>(0).Inherited[0] = tmp;
@@ -280,7 +282,7 @@ namespace MiniPascal
                 Name tmp = new Name();
 
                 IntermediateInstruction code = ic.CreateBinary(op, tmp, x, y);
-                Console.WriteLine(code.ToString());
+                // Console.WriteLine(code.ToString());
                 env.machine.AddInstruction(code);
 
                 stk.ElementAt<Tag>(0).Inherited[0] = tmp;
@@ -309,7 +311,7 @@ namespace MiniPascal
                 Name tmp = new Name();
 
                 IntermediateInstruction code = ic.CreateBinary(op, tmp, x, y);
-                Console.WriteLine(code.ToString());
+                // Console.WriteLine(code.ToString());
                 env.machine.AddInstruction(code);
 
                 stk.ElementAt<Tag>(0).Inherited[0] = tmp;
@@ -319,7 +321,7 @@ namespace MiniPascal
             {
                 stk.ElementAt<Tag>(0).Inherited[0] = new Name(((IdVar)tk).Lexema);
             }
-            else if (action == Tag._Indexed)
+            else if (action == Tag._ToArray)
             {
                 Name tmp = new Name();
 
@@ -327,7 +329,20 @@ namespace MiniPascal
                 Address i = (Address)action.Inherited[0];
 
                 IntermediateInstruction code = ic.CreateToArray(tmp, i, y);
-                Console.WriteLine(code.ToString());
+                // Console.WriteLine(code.ToString());
+                env.machine.AddInstruction(code);
+
+                stk.ElementAt<Tag>(1).Inherited[0] = tmp;
+            }
+            else if (action == Tag._FromArray)
+            {
+                Name tmp = new Name();
+
+                Address y = (Address)action.Inherited[1];
+                Address i = (Address)action.Inherited[0];
+
+                IntermediateInstruction code = ic.CreateFromArray(tmp, i, y);
+                // Console.WriteLine(code.ToString());
                 env.machine.AddInstruction(code);
 
                 stk.ElementAt<Tag>(1).Inherited[0] = tmp;
@@ -342,17 +357,26 @@ namespace MiniPascal
                 Address rValue = (Address)action.Inherited[0];
 
                 IntermediateInstruction code = ic.CreateCopy(lValue, rValue);
-                Console.WriteLine(code.ToString());
+                // Console.WriteLine(code.ToString());
                 env.machine.AddInstruction(code);
             }
             else if (action == Tag._RetAssign)
             {
-                Address lValue = Accumulator.accumulator;
+                Address lValue = env.returnvalue;
                 Address rValue = (Address)action.Inherited[0];
 
-                IntermediateInstruction code = ic.CreateCopy(lValue, rValue);
-                Console.WriteLine(code.ToString());
-                env.machine.AddInstruction(code);
+                if (lValue == null)
+                    lValue = new Name();
+
+                IntermediateInstruction code1 = ic.CreateCopy(lValue, rValue);
+                // Console.WriteLine(code1.ToString());
+                env.machine.AddInstruction(code1);
+
+                env.returnvalue = lValue;
+
+                IntermediateInstruction code2 = ic.CreateRetVal(lValue); // ic.CreateCopy(lValue, rValue);
+                // Console.WriteLine(code2.ToString());
+                env.machine.AddInstruction(code2);
             }
 
             else if (action == Tag._IfExp)
@@ -369,12 +393,12 @@ namespace MiniPascal
             else if (action == Tag._Then)
             {
                 ((IntermediateInstruction)action.Inherited[0])[0].Arg2 = new Label(env.machine.Count);
-                Console.WriteLine(action.Inherited[0].ToString());
+                // Console.WriteLine(action.Inherited[0].ToString());
             }
             else if (action == Tag._Else)
             {
                 ((IntermediateInstruction)action.Inherited[0])[0].Arg2 = new Label(env.machine.Count + 1);
-                Console.WriteLine(action.Inherited[0].ToString());
+                // Console.WriteLine(action.Inherited[0].ToString());
 
                 IntermediateInstruction code = ic.CreateGoto(null);
                 env.machine.AddInstruction(code);
@@ -385,13 +409,13 @@ namespace MiniPascal
             {
                 Label exit = new Label(env.machine.Count + 1);
                 ((IntermediateInstruction)action.Inherited[0])[0].Arg2 = exit;
-                Console.WriteLine(action.Inherited[0].ToString());
+                // Console.WriteLine(action.Inherited[0].ToString());
                 IntermediateInstruction code = ic.CreateGoto(exit);
                 env.machine.AddInstruction(code);
             }
 
             else if (action == Tag._Loop)
-            { 
+            {
                 Label loop = new Label(env.machine.Count);
                 stk.ElementAt<Tag>(5).Inherited[1] = loop;
             }
@@ -409,7 +433,7 @@ namespace MiniPascal
             else if (action == Tag._Do)
             {
                 ((IntermediateInstruction)action.Inherited[0])[0].Arg2 = new Label(env.machine.Count);
-                Console.WriteLine(action.Inherited[0].ToString());
+                // Console.WriteLine(action.Inherited[0].ToString());
             }
             else if (action == Tag._ExitWhile)
             {
@@ -418,7 +442,7 @@ namespace MiniPascal
                 env.machine.AddInstruction(code);
 
                 ((IntermediateInstruction)action.Inherited[0])[0].Arg2 = new Label(env.machine.Count);
-                Console.WriteLine(action.Inherited[0].ToString());
+                // Console.WriteLine(action.Inherited[0].ToString());
             }
 
             else if (action == Tag._MainCode)
@@ -429,11 +453,21 @@ namespace MiniPascal
             {
                 // Insere uma instrução ret no final do código do programa.
                 IntermediateInstruction code = ic.CreateReturn();
-                Console.WriteLine(code.ToString());
+                // Console.WriteLine(code.ToString());
                 env.machine.AddInstruction(code);
+
+                string str = "program " + programName + " " + env.ToString();
+
+                Console.WriteLine(str);
+                Console.ReadKey();
             }
 
             #endregion
+
+            else if (action == Tag._ProgramName)
+            {
+                programName = ((IdNew)tk).Lexema;
+            }
 
             else if (action == Tag._Echo)
             {

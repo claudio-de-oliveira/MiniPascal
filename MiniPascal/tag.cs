@@ -159,7 +159,9 @@ namespace MiniPascal
             term = new Tag(VN_MASK | 27, "<term>", 0),
             term_ = new Tag(VN_MASK | 28, "<term'>", 1),
             factor = new Tag(VN_MASK | 29, "<factor>", 0),
-            factor_ = new Tag(VN_MASK | 30, "<factor'>", 1);
+            factor_ = new Tag(VN_MASK | 30, "<factor'>", 1),
+            varexp = new Tag(VN_MASK | 31, "<varexp>", 1)
+            ;
 
         public static Tag
             _Begin = new Tag(AC_MASK | 1, "@Begin", 0),
@@ -202,10 +204,11 @@ namespace MiniPascal
             _Rel = new Tag(AC_MASK | 47, "@Rel", 3),
 
             _Variable = new Tag(AC_MASK | 48, "@Variable", 0),
-            _Indexed = new Tag(AC_MASK | 49, "@Indexed", 2),
+            _ToArray = new Tag(AC_MASK | 49, "@Indexed", 2),
             _LValue = new Tag(AC_MASK | 50, "@LValue", 1),
             _Assign = new Tag(AC_MASK | 51, "@Assign", 2),
             _RetAssign = new Tag(AC_MASK | 52, "@RetAssign", 2),
+            _FromArray = new Tag(AC_MASK | 53, "@FromArray", 2),
 
             _IfExp = new Tag(AC_MASK | 60, "@IfExp", 1),
             _Then = new Tag(AC_MASK | 61, "@Then", 1),
@@ -219,6 +222,7 @@ namespace MiniPascal
 
             _MainCode = new Tag(AC_MASK | 90, "@MainCode", 0),
             _Done = new Tag(AC_MASK | 91, "@Done", 0),
+            _ProgramName = new Tag(AC_MASK | 92, "@ProgramName", 0),
 
             _Echo = new Tag(AC_MASK | 99, "@Echo", 1);
     }

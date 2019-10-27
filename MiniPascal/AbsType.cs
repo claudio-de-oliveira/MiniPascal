@@ -39,18 +39,39 @@ namespace MiniPascal
 
         public override string ToString()
         {
-            string str = "procedure ";
+            string str = "";
             List<string> keys = new List<string>();
 
-            foreach (string id in Env.parameters.Keys)
-                keys.Add(id);
+            // cabeçalho
+            int i = 0;
 
-            if (keys.Count > 0)
-                str += "(";
-            for (int i = 0; i < keys.Count - 1; i++)
-                str += keys[i] + " : " + Env.parameters[keys[i]].ToString() + ", ";
-            if (keys.Count > 0)
-                str += keys[keys.Count - 1] + " : " + Env.parameters[keys[keys.Count - 1]].ToString() + ")";
+            str += "(";
+            foreach (string key in Env.parameters.Keys)
+            {
+                str += key + " : " + Env.parameters[key].ToString();
+
+                if (++i < Env.parameters.Keys.Count)
+                    str += "; ";
+            }
+            str += ")";
+
+            str += ";\n";
+
+            // Locais
+            foreach (string id in Env.locals.Keys)
+                str += "var\n\t" + id + " : " + Env.locals[id].ToString() + ";\n";
+
+            // Código
+            str += "begin\n";
+            i = Env.CodeAddress;
+            str += "\t$" + i + ":\t" + Env.machine[i].ToString() + "\n";
+            do
+            {
+                i++;
+                str += "\t$" + i + ":\t" + Env.machine[i].ToString() + "\n";
+            }
+            while (Env.machine[i].GetType() != typeof(Return));
+            str += "end;";
 
             return str;
         }
@@ -68,22 +89,39 @@ namespace MiniPascal
 
         public override string ToString()
         {
-            string str = "function ";
+            string str = "";
             List<string> keys = new List<string>();
 
-            foreach (string id in Env.parameters.Keys)
-                keys.Add(id);
+            // cabeçalho
+            int i = 0;
 
-            if (keys.Count > 0)
-                str += "(";
-            for (int i = 0; i < keys.Count - 1; i++)
-                str += keys[i] + " : " + Env.parameters[keys[i]].ToString() + ", ";
-            if (keys.Count > 0)
-                str += keys[keys.Count - 1] + " : " + Env.parameters[keys[keys.Count - 1]].ToString() + ") : ";
-            else
-                str += ": ";
+            str += "(";
+            foreach (string key in Env.parameters.Keys)
+            {
+                str += key + " : " + Env.parameters[key].ToString();
 
-            str += ReturnType.ToString();
+                if (++i < Env.parameters.Keys.Count)
+                    str += "; ";
+            }
+            str += ") : ";
+
+            str += ReturnType.ToString() + ";\n";
+
+            // Locais
+            foreach (string id in Env.locals.Keys)
+                str += "var\n\t" + id + " : " + Env.locals[id].ToString() + ";\n";
+
+            // Código
+            str += "begin\n";
+            i = Env.CodeAddress;
+            str += "\t$" + i + ":\t" + Env.machine[i].ToString() + "\n";
+            do
+            {
+                i++;
+                str += "\t$" + i + ":\t" + Env.machine[i].ToString() + "\n";
+            }
+            while (Env.machine[i].GetType() != typeof(Return));
+            str += "end;";
 
             return str;
         }

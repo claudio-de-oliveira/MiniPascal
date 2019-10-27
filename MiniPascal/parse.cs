@@ -9,8 +9,8 @@ namespace MiniPascal
     {
         #region LL(1) Parse Tables
         public static Tag[][] RHS = new Tag[][] {
-            // 0.	<program> ::= 'program' 'idnew' '(' <identifier_list> @Args ')' ';' <declarations> <subprogram_declarations> @MainCode <compound_statement> @Done '.' '#' .
-            new Tag[] {Tag.PROGRAM, Tag.IDNEW, Tag.LPAR, Tag.identifier_list, Tag._Args, Tag.RPAR, Tag.SEMICOLON, Tag.declarations, Tag.subprogram_declarations, Tag._MainCode, Tag.compound_statement, Tag._Done, Tag.DOT, Tag.vtSharp, },
+            // 0.	<program> ::= 'program' 'idnew' @ProgramName '(' <identifier_list> @Args ')' ';' <declarations> <subprogram_declarations> @MainCode <compound_statement> @Done '.' '#' .
+            new Tag[] {Tag.PROGRAM, Tag.IDNEW, Tag._ProgramName, Tag.LPAR, Tag.identifier_list, Tag._Args, Tag.RPAR, Tag.SEMICOLON, Tag.declarations, Tag.subprogram_declarations, Tag._MainCode, Tag.compound_statement, Tag._Done, Tag.DOT, Tag.vtSharp, },
             // 1.	<identifier_list> ::= 'idnew' @CreateList <identifier_list'> .
             new Tag[] {Tag.IDNEW, Tag._CreateList, Tag.identifier_list_, },
             // 2.	<identifier_list'> ::= @Echo .
@@ -57,7 +57,7 @@ namespace MiniPascal
             new Tag[] {Tag.statement_list, },
             // 23.	<statement_list> ::= <statement> <statement_list'> .
             new Tag[] {Tag.statement, Tag.statement_list_, },
-            // 24.	<statement_list'> ::=  .
+            // 24.	<statement_list'> ::= .
             new Tag[] {},
             // 25.	<statement_list'> ::= ';' <statement> <statement_list'> .
             new Tag[] {Tag.SEMICOLON, Tag.statement, Tag.statement_list_, },
@@ -77,8 +77,8 @@ namespace MiniPascal
             new Tag[] {Tag.IDVAR, Tag._Variable, Tag.variable_, },
             // 33.	<variable'> ::= @Echo .
             new Tag[] {Tag._Echo, },
-            // 34.	<variable'> ::= '[' <simple_expression> @Indexed ']' .
-            new Tag[] {Tag.LCOL, Tag.simple_expression, Tag._Indexed, Tag.RCOL, },
+            // 34.	<variable'> ::= '[' <simple_expression> @ToArray ']' .
+            new Tag[] {Tag.LCOL, Tag.simple_expression, Tag._ToArray, Tag.RCOL, },
             // 35.	<procedure_statement> ::= 'idproc' @PAddress <procedure_statement'> @PCall .
             new Tag[] {Tag.IDPROC, Tag._PAddress, Tag.procedure_statement_, Tag._PCall, },
             // 36.	<procedure_statement'> ::= @NoArgs .
@@ -113,8 +113,8 @@ namespace MiniPascal
             new Tag[] {Tag.IDFUNC, Tag._FAddress, Tag.factor_, Tag._FCall },
             // 51.	<factor> ::= 'num' @Number .
             new Tag[] {Tag.NUM, Tag._Number, },
-            // 52.	<factor> ::= 'idvar' @Variable <variable'> @RValue .
-            new Tag[] {Tag.IDVAR, Tag._Variable, Tag.variable_, Tag._RValue, },
+            // 52.	<factor> ::= 'idvar' @Variable <varexp> @RValue .
+            new Tag[] {Tag.IDVAR, Tag._Variable, Tag.varexp, Tag._RValue, },
             // 53.	<factor> ::= '(' <expression> @Skip1 ')' .
             new Tag[] {Tag.LPAR, Tag.expression, Tag._Skip1, Tag.RPAR, },
             // 54.	<factor> ::= 'not' <factor> @Not .
@@ -123,6 +123,10 @@ namespace MiniPascal
             new Tag[] {Tag._NoArgs, },
             // 56.	<factor'> ::= '(' <expression_list> ')' .
             new Tag[] {Tag.LPAR, Tag.expression_list, Tag.RPAR, },
+            // 57.	<varexp> ::= @Echo .
+            new Tag[] {Tag._Echo, },
+            // 58.	<varexp> ::= '[' <simple_expression> @FromArray ']' .
+            new Tag[] {Tag.LCOL, Tag.simple_expression, Tag._FromArray, Tag.RCOL, },
         };
 
         public static int[][] M = new int[][] {
@@ -214,6 +218,9 @@ namespace MiniPascal
             // 55.	<factor'> ::=  .
             // 56.	<factor'> ::= '(' <expression_list> ')' .
             new int[] {-1, -1, -1, -1, -1, -1, 56, 55, 55, -1, 55, -1, -1, -1, -1, -1, -1, 55, -1, -1, -1, -1, -1, -1, 55, -1, -1, 55, 55, -1, 55, 55, 55, 55, -1, },
+            // 57.	<varexp> ::= @Echo .
+            // 58.	<varexp> ::= '[' <simple_expression> @FromArray ']' .
+            new int[] {-1, -1, -1, -1, -1, -1, -1, 57, 57, -1, 57, -1, -1, -1, 58, -1, -1, 57, -1, -1, -1, -1, -1, -1, 57, -1, -1, 57, 57, -1, 57, 57, 57, 57, -1, },
         };
         #endregion
 
@@ -330,6 +337,16 @@ namespace MiniPascal
                         case 49:
                             // 49.	<term'> ::= 'mulop' @MulOp <factor> @Mul <term'> .
                             stk.ElementAt<Tag>(3).Inherited[2] = A.Inherited[0];
+                            break;
+
+                        // 57.	<varexp> ::= @Echo .
+                        case 57:
+                            stk.ElementAt<Tag>(0).Inherited[0] = A.Inherited[0];
+                            break;
+
+                        // 58.	<varexp> ::= '[' <simple_expression> @FromArray ']' .
+                        case 58:
+                            stk.ElementAt<Tag>(2).Inherited[1] = A.Inherited[0];
                             break;
 
                         default:
