@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using IntermediateCode;
 
 namespace MiniPascal
 {
@@ -31,9 +32,9 @@ namespace MiniPascal
     {
         public Environment Env { get; private set; }
 
-        public ProcType(Environment parent) : base(EnumType.PROC)
+        public ProcType(Environment env, AbsMachine machine) : base(EnumType.PROC)
         { 
-            Env = new Environment(parent); 
+            Env = new Environment(env); 
         }
 
         public override string ToString()
@@ -60,8 +61,10 @@ namespace MiniPascal
         public Environment Env { get; private set; }
         public AbsType ReturnType { get; set; }
 
-        public FuncType(Environment parent) : base(EnumType.FUNC)
-        { Env = new Environment(parent); }
+        public FuncType(Environment env, AbsMachine machine) : base(EnumType.FUNC)
+        { 
+            Env = new Environment(env); 
+        }
 
         public override string ToString()
         {

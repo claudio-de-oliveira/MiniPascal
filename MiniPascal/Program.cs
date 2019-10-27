@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using IntermediateCode;
+
 namespace MiniPascal
 {
     class Program
@@ -23,7 +25,7 @@ namespace MiniPascal
                 "var\n" +
                 "   i : integer;\n" +
                 "begin\n" +
-                "   i := 1;\n" +
+                "   i := (1 + i) * 2 / a;\n" +
                 "   while i <= 10 do\n" +
                 "       begin\n" +
                 "           a[i] := a[0];\n" +
@@ -37,6 +39,7 @@ namespace MiniPascal
                 "end;\n" +
                 "\n" +
                 "begin\n" +
+                "   inicializa;\n" +
                 "   x := 10;\n" +
                 "   y := 20;\n" +
                 "   if max(x, y) = x then\n" +

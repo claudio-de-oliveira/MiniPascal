@@ -2,18 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using IntermediateCode;
+
+
 namespace MiniPascal
 {
     class Semantic
     {
+        AbsMachine ic = new AbsMachine();
+
         public void Execute(Tag action, Stack<Tag> stk, Token tk, ref Environment env)
         {
-            if (action == Tag._Echo)
-            {
-                stk.ElementAt<Tag>(0).Inherited[0] = action.Inherited[0];
-            }
-
-            else if (action == Tag._Begin)
+            #region Sentenças Declarativas
+            if (action == Tag._Begin)
             {
                 // Sinaliza o início de uma sentença imperativa
                 env.SentencaImperativa = true;
@@ -90,7 +91,7 @@ namespace MiniPascal
                 string lexema = ((IdNew)tk).Lexema;
 
                 // O contexto deve ser alterado logo antes dos parâmetros serem declarados
-                ProcType type = new ProcType(env);
+                ProcType type = new ProcType(env, env.machine);
 
                 env.locals.Add(lexema, type);
 
@@ -106,7 +107,7 @@ namespace MiniPascal
                 string lexema = ((IdNew)tk).Lexema;
 
                 // O contexto deve ser alterado logo antes dos parâmetros serem declarados
-                FuncType type = new FuncType(env);
+                FuncType type = new FuncType(env, env.machine);
 
                 env.locals.Add(lexema, type);
 
@@ -142,10 +143,13 @@ namespace MiniPascal
             }
             else if (action == Tag._EnvRestore)
             {
+                IntermediateInstruction code = ic.CreateReturn();
+                Console.WriteLine(code.ToString());
+                env.machine.AddInstruction(code);
+
                 env = env.parent;
             }
 
-            ////
             else if (action == Tag._Args)
             {
                 // Recebe a lista de argumentos do programa
@@ -153,7 +157,289 @@ namespace MiniPascal
                 foreach (string arg in (List<object>)action.Inherited[0])
                     env.parameters.Add(arg, AbsType.Untyped);
             }
-            else 
+            #endregion
+
+            #region Sentenças Imperativas
+            else if (action == Tag._Number)
+            {
+                stk.ElementAt<Tag>(0).Inherited[0] = Constant.Create(((Integer)tk).Value);
+            }
+            else if (action == Tag._RValue)
+            {
+                Address address = (Address)action.Inherited[0];
+                stk.ElementAt<Tag>(0).Inherited[0] = address;
+            }
+            else if (action == Tag._Not)
+            {
+                Name tmp = new Name();
+
+                IntermediateInstruction code = ic.CreateUnary(Operator.NOT, (Address)action.Inherited[0], tmp);
+                Console.WriteLine(code.ToString());
+                env.machine.AddInstruction(code);
+
+                stk.ElementAt<Tag>(0).Inherited[0] = tmp;
+            }
+            else if (action == Tag._Skip1)
+            {
+                stk.ElementAt<Tag>(1).Inherited[0] = action.Inherited[0];
+            }
+            else if (action == Tag._FAddress) // Endereço da função
+            {
+                FuncType func = (FuncType)Environment.Search(env, ((IdFunc)tk).Lexema);
+
+                stk.ElementAt<Tag>(1).Inherited[1] = func.Env.CodeAddress;
+            }
+            else if (action == Tag._PAddress) // Endereço do procedimento
+            {
+                ProcType proc = (ProcType)Environment.Search(env, ((IdProc)tk).Lexema);
+
+                stk.ElementAt<Tag>(1).Inherited[1] = proc.Env.CodeAddress;
+            }
+            else if (action == Tag._FCall) // Chamada de função
+            {
+                // Destino
+                Label label = new Label((int)action.Inherited[1]);
+                // Número de argumentos
+                int n = (int)action.Inherited[0];
+
+                IntermediateInstruction code = ic.CreateCall(label, n);
+                Console.WriteLine(code.ToString());
+                env.machine.AddInstruction(code);
+
+                stk.ElementAt<Tag>(0).Inherited[0] = Accumulator.accumulator;
+            }
+            else if (action == Tag._PCall) // Chamada de procedimento
+            {
+                // Destino
+                Label label = new Label((int)action.Inherited[1]);
+                // Número de argumentos
+                int n = (int)action.Inherited[0];
+
+                IntermediateInstruction code = ic.CreateCall(label, n);
+                Console.WriteLine(code.ToString());
+                env.machine.AddInstruction(code);
+            }
+            else if (action == Tag._FirstActualPar) // Primeiro parâmetro atual
+            {
+                IntermediateInstruction code = ic.CreateParam((Address)action.Inherited[0]);
+                Console.WriteLine(code.ToString());
+                env.machine.AddInstruction(code);
+
+                stk.ElementAt<Tag>(0).Inherited[0] = 1; // Primeiro parametro
+            }
+            else if (action == Tag._NextActualPar) // Próximo parâmetro atual
+            {
+                IntermediateInstruction code = ic.CreateParam((Address)action.Inherited[0]);
+                Console.WriteLine(code.ToString());
+                env.machine.AddInstruction(code);
+
+                stk.ElementAt<Tag>(0).Inherited[0] = (int)action.Inherited[1] + 1;
+            }
+            else if (action == Tag._EndActualPar) // Lista de parâmetros atuais completa
+            {
+                stk.ElementAt<Tag>(1).Inherited[0] = (int)action.Inherited[0]; // Número de parâmetros
+            }
+            else if (action == Tag._NoArgs)
+            {
+                stk.ElementAt<Tag>(0).Inherited[0] = 0; // Não há parâmetros atuais
+            }
+            else if (action == Tag._AddOp)
+            {
+                if (((AddOp)tk).Value == '+')
+                    stk.ElementAt<Tag>(1).Inherited[1] = Operator.ADD;
+                else // if (((AddOp)tk).Value == '-')
+                    stk.ElementAt<Tag>(1).Inherited[1] = Operator.SUB;
+            }
+            else if (action == Tag._Add)
+            {
+                Address x = (Address)action.Inherited[2];
+                Operator op = (Operator)action.Inherited[1];
+                Address y = (Address)action.Inherited[0];
+
+                Name tmp = new Name();
+
+                IntermediateInstruction code = ic.CreateBinary(op, tmp, x, y);
+                Console.WriteLine(code.ToString());
+                env.machine.AddInstruction(code);
+
+                stk.ElementAt<Tag>(0).Inherited[0] = tmp;
+            }
+            else if (action == Tag._MulOp)
+            {
+                if (((MulOp)tk).Value == '*')
+                    stk.ElementAt<Tag>(1).Inherited[1] = Operator.MUL;
+                else // if (((MulOp)tk).Value == '/')
+                    stk.ElementAt<Tag>(1).Inherited[1] = Operator.DIV;
+            }
+            else if (action == Tag._Mul)
+            {
+                Address x = (Address)action.Inherited[2];
+                Operator op = (Operator)action.Inherited[1];
+                Address y = (Address)action.Inherited[0];
+
+                Name tmp = new Name();
+
+                IntermediateInstruction code = ic.CreateBinary(op, tmp, x, y);
+                Console.WriteLine(code.ToString());
+                env.machine.AddInstruction(code);
+
+                stk.ElementAt<Tag>(0).Inherited[0] = tmp;
+            }
+            else if (action == Tag._RelOp)
+            {
+                if (((RelOp)tk).Value == "<")
+                    stk.ElementAt<Tag>(1).Inherited[1] = Operator.LT;
+                else if (((RelOp)tk).Value == "<=")
+                    stk.ElementAt<Tag>(1).Inherited[1] = Operator.LE;
+                else if (((RelOp)tk).Value == ">")
+                    stk.ElementAt<Tag>(1).Inherited[1] = Operator.GT;
+                else if (((RelOp)tk).Value == ">=")
+                    stk.ElementAt<Tag>(1).Inherited[1] = Operator.GE;
+                else if (((RelOp)tk).Value == "=")
+                    stk.ElementAt<Tag>(1).Inherited[1] = Operator.EQ;
+                else // if (((RelOp)tk).Value == "<>")
+                    stk.ElementAt<Tag>(1).Inherited[1] = Operator.NEQ;
+            }
+            else if (action == Tag._Rel)
+            {
+                Address x = (Address)action.Inherited[2];
+                Operator op = (Operator)action.Inherited[1];
+                Address y = (Address)action.Inherited[0];
+
+                Name tmp = new Name();
+
+                IntermediateInstruction code = ic.CreateBinary(op, tmp, x, y);
+                Console.WriteLine(code.ToString());
+                env.machine.AddInstruction(code);
+
+                stk.ElementAt<Tag>(0).Inherited[0] = tmp;
+            }
+
+            else if (action == Tag._Variable)
+            {
+                stk.ElementAt<Tag>(0).Inherited[0] = new Name(((IdVar)tk).Lexema);
+            }
+            else if (action == Tag._Indexed)
+            {
+                Name tmp = new Name();
+
+                Address y = (Address)action.Inherited[1];
+                Address i = (Address)action.Inherited[0];
+
+                IntermediateInstruction code = ic.CreateToArray(tmp, i, y);
+                Console.WriteLine(code.ToString());
+                env.machine.AddInstruction(code);
+
+                stk.ElementAt<Tag>(1).Inherited[0] = tmp;
+            }
+            else if (action == Tag._LValue)
+            {
+                stk.ElementAt<Tag>(2).Inherited[1] = action.Inherited[0];
+            }
+            else if (action == Tag._Assign)
+            {
+                Address lValue = (Address)action.Inherited[1];
+                Address rValue = (Address)action.Inherited[0];
+
+                IntermediateInstruction code = ic.CreateCopy(lValue, rValue);
+                Console.WriteLine(code.ToString());
+                env.machine.AddInstruction(code);
+            }
+            else if (action == Tag._RetAssign)
+            {
+                Address lValue = Accumulator.accumulator;
+                Address rValue = (Address)action.Inherited[0];
+
+                IntermediateInstruction code = ic.CreateCopy(lValue, rValue);
+                Console.WriteLine(code.ToString());
+                env.machine.AddInstruction(code);
+            }
+
+            else if (action == Tag._IfExp)
+            {
+                IntermediateInstruction code1 = ic.CreateIfTrue((Address)action.Inherited[0], null); ;
+                env.machine.AddInstruction(code1);
+                IntermediateInstruction code2 = ic.CreateGoto(null);
+                env.machine.AddInstruction(code2);
+
+                stk.ElementAt<Tag>(0).Inherited[0] = code1;
+
+                stk.ElementAt<Tag>(3).Inherited[0] = code2;
+            }
+            else if (action == Tag._Then)
+            {
+                ((IntermediateInstruction)action.Inherited[0])[0].Arg2 = new Label(env.machine.Count);
+                Console.WriteLine(action.Inherited[0].ToString());
+            }
+            else if (action == Tag._Else)
+            {
+                ((IntermediateInstruction)action.Inherited[0])[0].Arg2 = new Label(env.machine.Count + 1);
+                Console.WriteLine(action.Inherited[0].ToString());
+
+                IntermediateInstruction code = ic.CreateGoto(null);
+                env.machine.AddInstruction(code);
+
+                stk.ElementAt<Tag>(2).Inherited[0] = code;
+            }
+            else if (action == Tag._ExitIf)
+            {
+                Label exit = new Label(env.machine.Count + 1);
+                ((IntermediateInstruction)action.Inherited[0])[0].Arg2 = exit;
+                Console.WriteLine(action.Inherited[0].ToString());
+                IntermediateInstruction code = ic.CreateGoto(exit);
+                env.machine.AddInstruction(code);
+            }
+
+            else if (action == Tag._Loop)
+            { 
+                Label loop = new Label(env.machine.Count);
+                stk.ElementAt<Tag>(5).Inherited[1] = loop;
+            }
+            else if (action == Tag._WhileExp)
+            {
+                IntermediateInstruction code1 = ic.CreateIfTrue((Address)action.Inherited[0], null); ;
+                env.machine.AddInstruction(code1);
+                IntermediateInstruction code2 = ic.CreateGoto(null);
+                env.machine.AddInstruction(code2);
+
+                stk.ElementAt<Tag>(1).Inherited[0] = code1;
+
+                stk.ElementAt<Tag>(3).Inherited[0] = code2;
+            }
+            else if (action == Tag._Do)
+            {
+                ((IntermediateInstruction)action.Inherited[0])[0].Arg2 = new Label(env.machine.Count);
+                Console.WriteLine(action.Inherited[0].ToString());
+            }
+            else if (action == Tag._ExitWhile)
+            {
+                Label loop = (Label)action.Inherited[1];
+                IntermediateInstruction code = ic.CreateGoto(loop);
+                env.machine.AddInstruction(code);
+
+                ((IntermediateInstruction)action.Inherited[0])[0].Arg2 = new Label(env.machine.Count);
+                Console.WriteLine(action.Inherited[0].ToString());
+            }
+
+            else if (action == Tag._MainCode)
+            {
+                Environment.root.EntryPoint();
+            }
+            else if (action == Tag._Done)
+            {
+                // Insere uma instrução ret no final do código do programa.
+                IntermediateInstruction code = ic.CreateReturn();
+                Console.WriteLine(code.ToString());
+                env.machine.AddInstruction(code);
+            }
+
+            #endregion
+
+            else if (action == Tag._Echo)
+            {
+                stk.ElementAt<Tag>(0).Inherited[0] = action.Inherited[0];
+            }
+            else
                 throw new NotImplementedException("Não implementado!");
         }
     }

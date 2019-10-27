@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using IntermediateCode;
 
 namespace MiniPascal
 {
@@ -8,8 +9,8 @@ namespace MiniPascal
     {
         #region LL(1) Parse Tables
         public static Tag[][] RHS = new Tag[][] {
-            // 0.	<program> ::= 'program' 'idnew' '(' <identifier_list> @Args ')' ';' <declarations> <subprogram_declarations> <compound_statement> '.' '#' .
-            new Tag[] {Tag.PROGRAM, Tag.IDNEW, Tag.LPAR, Tag.identifier_list, Tag._Args, Tag.RPAR, Tag.SEMICOLON, Tag.declarations, Tag.subprogram_declarations, Tag.compound_statement, Tag.DOT, Tag.vtSharp, },
+            // 0.	<program> ::= 'program' 'idnew' '(' <identifier_list> @Args ')' ';' <declarations> <subprogram_declarations> @MainCode <compound_statement> @Done '.' '#' .
+            new Tag[] {Tag.PROGRAM, Tag.IDNEW, Tag.LPAR, Tag.identifier_list, Tag._Args, Tag.RPAR, Tag.SEMICOLON, Tag.declarations, Tag.subprogram_declarations, Tag._MainCode, Tag.compound_statement, Tag._Done, Tag.DOT, Tag.vtSharp, },
             // 1.	<identifier_list> ::= 'idnew' @CreateList <identifier_list'> .
             new Tag[] {Tag.IDNEW, Tag._CreateList, Tag.identifier_list_, },
             // 2.	<identifier_list'> ::= @Echo .
@@ -60,66 +61,66 @@ namespace MiniPascal
             new Tag[] {},
             // 25.	<statement_list'> ::= ';' <statement> <statement_list'> .
             new Tag[] {Tag.SEMICOLON, Tag.statement, Tag.statement_list_, },
-            // 26.	<statement> ::= <variable> 'assignop' <expression> .
-            new Tag[] {Tag.variable, Tag.ASSIGNOP, Tag.expression, },
-            // 27.	<statement> ::= 'idfunc' 'assignop' <expression> .
-            new Tag[] {Tag.IDFUNC, Tag.ASSIGNOP, Tag.expression, },
+            // 26.	<statement> ::= <variable> @LValue 'assignop' <expression> @Assign .
+            new Tag[] {Tag.variable, Tag._LValue, Tag.ASSIGNOP, Tag.expression, Tag._Assign, },
+            // 27.	<statement> ::= 'idfunc' 'assignop' <expression> @RetAssign .
+            new Tag[] {Tag.IDFUNC, Tag.ASSIGNOP, Tag.expression, Tag._RetAssign },
             // 28.	<statement> ::= <procedure_statement> .
             new Tag[] {Tag.procedure_statement, },
             // 29.	<statement> ::= 'begin' <optional_statements> 'end' .
             new Tag[] {Tag.BEGIN, Tag.optional_statements, Tag.END, },
-            // 30.	<statement> ::= 'if' <expression> 'then' <statement> 'else' <statement> .
-            new Tag[] {Tag.IF, Tag.expression, Tag.THEN, Tag.statement, Tag.ELSE, Tag.statement, },
-            // 31.	<statement> ::= 'while' <expression> 'do' <statement> .
-            new Tag[] {Tag.WHILE, Tag.expression, Tag.DO, Tag.statement, },
-            // 32.	<variable> ::= 'idvar' <variable'> .
-            new Tag[] {Tag.IDVAR, Tag.variable_, },
-            // 33.	<variable'> ::=  .
-            new Tag[] {},
-            // 34.	<variable'> ::= '[' <simple_expression> ']' .
-            new Tag[] {Tag.LCOL, Tag.simple_expression, Tag.RCOL, },
-            // 35.	<procedure_statement> ::= 'idproc' <procedure_statement'> .
-            new Tag[] {Tag.IDPROC, Tag.procedure_statement_, },
-            // 36.	<procedure_statement'> ::=  .
-            new Tag[] {},
+            // 30.	<statement> ::= 'if' <expression> @IfExp @Then 'then' <statement> @Else 'else' <statement> @ExitIf .
+            new Tag[] {Tag.IF, Tag.expression, Tag._IfExp, Tag._Then, Tag.THEN, Tag.statement, Tag._Else, Tag.ELSE, Tag.statement, Tag._ExitIf, },
+            // 31.	<statement> ::= 'while' @Loop <expression> @WhileExp 'do' @Do <statement> @ExitWhile .
+            new Tag[] {Tag.WHILE, Tag._Loop, Tag.expression, Tag._WhileExp, Tag.DO, Tag._Do, Tag.statement, Tag._ExitWhile, },
+            // 32.	<variable> ::= 'idvar' @Variable <variable'> .
+            new Tag[] {Tag.IDVAR, Tag._Variable, Tag.variable_, },
+            // 33.	<variable'> ::= @Echo .
+            new Tag[] {Tag._Echo, },
+            // 34.	<variable'> ::= '[' <simple_expression> @Indexed ']' .
+            new Tag[] {Tag.LCOL, Tag.simple_expression, Tag._Indexed, Tag.RCOL, },
+            // 35.	<procedure_statement> ::= 'idproc' @PAddress <procedure_statement'> @PCall .
+            new Tag[] {Tag.IDPROC, Tag._PAddress, Tag.procedure_statement_, Tag._PCall, },
+            // 36.	<procedure_statement'> ::= @NoArgs .
+            new Tag[] {Tag._NoArgs, },
             // 37.	<procedure_statement'> ::= '(' <expression_list> ')' .
             new Tag[] {Tag.LPAR, Tag.expression_list, Tag.RPAR, },
-            // 38.	<expression_list> ::= <expression> <expression_list'> .
-            new Tag[] {Tag.expression, Tag.expression_list_, },
-            // 39.	<expression_list'> ::=  .
-            new Tag[] {},
-            // 40.	<expression_list'> ::= ',' <expression> <expression_list'> .
-            new Tag[] {Tag.COMMA, Tag.expression, Tag.expression_list_, },
+            // 38.	<expression_list> ::= <expression> @FirstActualPar <expression_list'> .
+            new Tag[] {Tag.expression, Tag._FirstActualPar, Tag.expression_list_, },
+            // 39.	<expression_list'> ::= @EndActualPar .
+            new Tag[] {Tag._EndActualPar, },
+            // 40.	<expression_list'> ::= ',' <expression> @NextActualPar <expression_list'> .
+            new Tag[] {Tag.COMMA, Tag.expression, Tag._NextActualPar, Tag.expression_list_, },
             // 41.	<expression> ::= <simple_expression> <expression'> .
             new Tag[] {Tag.simple_expression, Tag.expression_, },
-            // 42.	<expression'> ::=  .
-            new Tag[] {},
-            // 43.	<expression'> ::= 'relop' <simple_expression> .
-            new Tag[] {Tag.RELOP, Tag.simple_expression, },
+            // 42.	<expression'> ::= @Echo .
+            new Tag[] {Tag._Echo, },
+            // 43.	<expression'> ::= 'relop' @RelOp <simple_expression> @Rel .
+            new Tag[] {Tag.RELOP, Tag._RelOp, Tag.simple_expression, Tag._Rel, },
             // 44.	<simple_expression> ::= <term> <simple_expression'> .
             new Tag[] {Tag.term, Tag.simple_expression_, },
-            // 45.	<simple_expression'> ::=  .
-            new Tag[] {},
-            // 46.	<simple_expression'> ::= 'addop' <term> <simple_expression'> .
-            new Tag[] {Tag.ADDOP, Tag.term, Tag.simple_expression_, },
+            // 45.	<simple_expression'> ::= @Echo .
+            new Tag[] {Tag._Echo, },
+            // 46.	<simple_expression'> ::= 'addop' @AddOp <term> @Add <simple_expression'> .
+            new Tag[] {Tag.ADDOP, Tag._AddOp, Tag.term, Tag._Add, Tag.simple_expression_, },
             // 47.	<term> ::= <factor> <term'> .
             new Tag[] {Tag.factor, Tag.term_, },
-            // 48.	<term'> ::=  .
-            new Tag[] {},
-            // 49.	<term'> ::= 'mulop' <factor> <term'> .
-            new Tag[] {Tag.MULOP, Tag.factor, Tag.term_, },
-            // 50.	<factor> ::= 'idfunc' <factor'> .
-            new Tag[] {Tag.IDFUNC, Tag.factor_, },
-            // 51.	<factor> ::= 'num' .
-            new Tag[] {Tag.NUM, },
-            // 52.	<factor> ::= 'idvar' <variable'> .
-            new Tag[] {Tag.IDVAR, Tag.variable_, },
-            // 53.	<factor> ::= '(' <expression> ')' .
-            new Tag[] {Tag.LPAR, Tag.expression, Tag.RPAR, },
-            // 54.	<factor> ::= 'not' <factor> .
-            new Tag[] {Tag.NOT, Tag.factor, },
-            // 55.	<factor'> ::=  .
-            new Tag[] {},
+            // 48.	<term'> ::= @Echo .
+            new Tag[] {Tag._Echo, },
+            // 49.	<term'> ::= 'mulop' @MulOp <factor> @Mul <term'> .
+            new Tag[] {Tag.MULOP, Tag._MulOp, Tag.factor, Tag._Mul, Tag.term_, },
+            // 50.	<factor> ::= 'idfunc' @FAddress <factor'> @FCall .
+            new Tag[] {Tag.IDFUNC, Tag._FAddress, Tag.factor_, Tag._FCall },
+            // 51.	<factor> ::= 'num' @Number .
+            new Tag[] {Tag.NUM, Tag._Number, },
+            // 52.	<factor> ::= 'idvar' @Variable <variable'> @RValue .
+            new Tag[] {Tag.IDVAR, Tag._Variable, Tag.variable_, Tag._RValue, },
+            // 53.	<factor> ::= '(' <expression> @Skip1 ')' .
+            new Tag[] {Tag.LPAR, Tag.expression, Tag._Skip1, Tag.RPAR, },
+            // 54.	<factor> ::= 'not' <factor> @Not .
+            new Tag[] {Tag.NOT, Tag.factor, Tag._Not, },
+            // 55.	<factor'> ::= @NoArgs .
+            new Tag[] {Tag._NoArgs, },
             // 56.	<factor'> ::= '(' <expression_list> ')' .
             new Tag[] {Tag.LPAR, Tag.expression_list, Tag.RPAR, },
         };
@@ -231,14 +232,15 @@ namespace MiniPascal
         {
             Scanner lex = new Scanner();
             Semantic sem = new Semantic();
+            AbsMachine machine = new AbsMachine();
 
             text += "#";
 
             int pos = 0;
             Stack<Tag> stk = new Stack<Tag>();
 
-            // Criação da Tabela de Símbolos (Principal)
-            Environment simbolTable = new Environment(null);
+            // Tabela de Símbolos Principal
+            Environment simbolTable = Environment.root;
 
             // Local para introduzir símbolos globais
             // ....
@@ -247,7 +249,7 @@ namespace MiniPascal
 
             Token current = lex.NextToken(text, simbolTable, ref pos);
 
-            Console.WriteLine(current.ToString());
+            // Console.WriteLine(current.ToString());
 
             PushRHS(stk, RHS[0]);
 
@@ -280,6 +282,56 @@ namespace MiniPascal
                             stk.ElementAt<Tag>(2).Inherited[0] = A.Inherited[0];
                             break;
 
+                        // 33.	<variable'> ::= @Echo .
+                        case 33:
+                            stk.ElementAt<Tag>(0).Inherited[0] = A.Inherited[0];
+                            break;
+
+                        // 34.	<variable'> ::= '[' <simple_expression> @Indexed ']' .
+                        case 34:
+                            stk.ElementAt<Tag>(2).Inherited[1] = A.Inherited[0];
+                            break;
+
+                        // 39.	<expression_list'> ::= @EndActualPar .
+                        case 39:
+                            stk.ElementAt<Tag>(0).Inherited[0] = A.Inherited[0];
+                            break;
+
+                        // 40.	<expression_list'> ::= ',' <expression> @NextActualPar <expression_list'> .
+                        case 40:
+                            stk.ElementAt<Tag>(2).Inherited[1] = A.Inherited[0];
+                            break;
+
+                        // 42.	<expression'> ::= @Echo .
+                        case 42:
+                            stk.ElementAt<Tag>(0).Inherited[0] = A.Inherited[0];
+                            break;
+
+                        // 43.	<expression'> ::= 'relop' @RelOp <simple_expression> @Rel .
+                        case 43:
+                            stk.ElementAt<Tag>(3).Inherited[2] = A.Inherited[0];
+                            break;
+
+                        // 45.	<simple_expression'> ::= @Echo  .
+                        case 45:
+                            stk.ElementAt<Tag>(0).Inherited[0] = A.Inherited[0];
+                            break;
+
+                        // 46.	<simple_expression'> ::= 'addop' @AddOp <term> @Add <simple_expression'> .
+                        case 46:
+                            stk.ElementAt<Tag>(3).Inherited[2] = A.Inherited[0];
+                            break;
+
+                        // 48.	<term'> ::= @Echo .
+                        case 48:
+                            stk.ElementAt<Tag>(0).Inherited[0] = A.Inherited[0];
+                            break;
+
+                        case 49:
+                            // 49.	<term'> ::= 'mulop' @MulOp <factor> @Mul <term'> .
+                            stk.ElementAt<Tag>(3).Inherited[2] = A.Inherited[0];
+                            break;
+
                         default:
                             break;
                     }
@@ -299,7 +351,7 @@ namespace MiniPascal
                     previous = current;
                     current = lex.NextToken(text, simbolTable, ref pos);
 
-                    Console.WriteLine(current.ToString());
+                    // Console.WriteLine(current.ToString());
 
                     if (current == Token.UNKNOW)
                     {

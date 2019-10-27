@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using IntermediateCode;
+
 namespace MiniPascal
 {
     public class Environment
@@ -11,7 +13,21 @@ namespace MiniPascal
         public Environment parent;
         public Dictionary<string, AbsType> locals;
         public Dictionary<string, AbsType> parameters;
-        public bool SentencaImperativa; 
+        public bool SentencaImperativa;
+        public AbsMachine machine;
+        public int CodeAddress;
+
+        public static Environment root = new Environment(new AbsMachine());
+
+        private Environment(AbsMachine machine)
+        {
+            this.parent = null;
+            parameters = new Dictionary<string, AbsType>();
+            locals = new Dictionary<string, AbsType>();
+            SentencaImperativa = false;
+            this.machine = machine;
+            // O CodeAddress é inicializado pela ação semântica @MainCode
+        }
 
         public Environment(Environment parent)
         {
@@ -19,6 +35,13 @@ namespace MiniPascal
             parameters = new Dictionary<string, AbsType>();
             locals = new Dictionary<string, AbsType>();
             SentencaImperativa = false;
+            this.machine = parent.machine;
+            EntryPoint();
+        }
+
+        public void EntryPoint()
+        { 
+            CodeAddress = machine.Count;
         }
 
         public static AbsType SearchLocal(Environment corrente, string simbolo)

@@ -4,17 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{347E81EF-0A58-4930-AE50-FD8C3EE535FC}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>MiniPascal</RootNamespace>
-    <AssemblyName>MiniPascal</AssemblyName>
+    <ProjectGuid>{A7E03956-4D51-4DF0-A7E1-A01B0670F157}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>IntermediateCode</RootNamespace>
+    <AssemblyName>IntermediateCode</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +23,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -43,24 +41,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AbsType.cs" />
-    <Compile Include="Environment.cs" />
-    <Compile Include="parse.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="ArrayOf.cs" />
+    <Compile Include="BitSet.cs" />
+    <Compile Include="Block.cs" />
+    <Compile Include="Graph.cs" />
+    <Compile Include="AbsMachine.cs" />
+    <Compile Include="IntermediateInstruction.cs" />
+    <Compile Include="KeyedData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scanner.cs" />
-    <Compile Include="Semantic.cs" />
-    <Compile Include="tag.cs" />
-    <Compile Include="token.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\IntermediateCode\IntermediateCode.csproj">
-      <Project>{a7e03956-4d51-4df0-a7e1-a01b0670f157}</Project>
-      <Name>IntermediateCode</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -151,10 +151,10 @@ namespace MiniPascal
         public string Lexema { get; private set; }
         public Environment Context { get; private set; }
 
-        public IdProc(string lexema, Environment parent) : base(Tag.IDPROC)
+        public IdProc(string lexema, Environment env) : base(Tag.IDPROC)
         {
             Lexema = lexema;
-            Context = new Environment(parent);
+            Context = new Environment(env);
         }
 
         public override string ToString()
