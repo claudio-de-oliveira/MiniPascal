@@ -20,6 +20,14 @@ namespace MiniPascal
             inherited = new object[iCounter];
         }
 
+        public Tag Clone()
+        {
+            if (inherited.Length > 0)
+                return new Tag(tag, name, inherited.Length);
+            else
+                return this;
+        }
+
         public object[] Inherited
         { get { return inherited; } }
 

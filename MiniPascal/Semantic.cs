@@ -459,6 +459,9 @@ namespace MiniPascal
                 string str = "program " + programName + " " + env.ToString();
 
                 Console.WriteLine(str);
+
+                Console.WriteLine("\nPRESSIONE UMA TECLA PARA CONTINUAR...");
+
                 Console.ReadKey();
             }
 

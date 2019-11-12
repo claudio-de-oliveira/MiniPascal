@@ -232,7 +232,7 @@ namespace MiniPascal
         private static void PushRHS(Stack<Tag> stk, Tag[] rhs)
         {
             for (int i = rhs.Length - 1; i >= 0; i--)
-                stk.Push(rhs[i]);
+                stk.Push(rhs[i].Clone());
         }
 
         public bool Parse(string text)
